@@ -1,0 +1,14 @@
+body {
+  min-height: 100vh;
+  background-color: var(--bs-light);
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#page-root {
+  flex: 1;
+}
