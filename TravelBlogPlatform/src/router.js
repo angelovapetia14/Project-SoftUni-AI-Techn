@@ -4,6 +4,7 @@ import { getLoginPage } from './pages/login/login.js';
 import { getRegisterPage } from './pages/register/register.js';
 import { getCreatePostPage } from './pages/create-post/create-post.js';
 import { getPostDetailsPage } from './pages/post-details/post-details.js';
+import { getAdminPage } from './pages/admin/admin.js';
 
 const implementedRoutes = {
   '/': getIndexPage,
@@ -11,10 +12,11 @@ const implementedRoutes = {
   '/login': getLoginPage,
   '/register': getRegisterPage,
   '/create-post': getCreatePostPage,
-  '/post-details': getPostDetailsPage
+  '/post-details': getPostDetailsPage,
+  '/admin': getAdminPage
 };
 
-const scaffoldedRoutes = ['/edit-post', '/admin'];
+const scaffoldedRoutes = ['/edit-post'];
 
 const scaffoldedRouteTitles = {
   '/login': 'Login | Travel Blog Platform',

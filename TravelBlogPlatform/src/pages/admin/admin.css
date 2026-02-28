@@ -1,0 +1,7 @@
+.admin-dashboard .table th {
+  white-space: nowrap;
+}
+
+.admin-dashboard .btn-sm {
+  min-width: 88px;
+}
