@@ -1,0 +1,30 @@
+<section class="auth-page rounded-3 overflow-hidden d-flex align-items-center justify-content-center px-3 py-5">
+  <div class="auth-overlay w-100 d-flex justify-content-center">
+    <div class="card auth-card shadow border-0">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h3 text-center mb-4">Login</h1>
+
+        <div id="login-error" class="alert alert-danger d-none" role="alert"></div>
+
+        <form id="login-form" class="d-grid gap-3" novalidate>
+          <div>
+            <label for="login-email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="login-email" placeholder="name@example.com" required />
+          </div>
+
+          <div>
+            <label for="login-password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="login-password" placeholder="••••••••" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <p class="text-center text-muted mt-4 mb-0">
+          Don't have an account?
+          <a href="/register" data-link>Register</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
