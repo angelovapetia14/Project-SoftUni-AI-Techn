@@ -9,6 +9,7 @@ function getPathname() {
 function renderApp() {
   const appElement = document.getElementById('app');
   const route = resolveRoute(window.location);
+  document.title = route.title ?? 'Travel Blog Platform';
 
   appElement.innerHTML = `
     ${renderHeader(getPathname())}

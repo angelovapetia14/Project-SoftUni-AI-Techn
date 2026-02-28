@@ -8,11 +8,21 @@ const implementedRoutes = {
 
 const scaffoldedRoutes = ['/login', '/register', '/create-post', '/post-details', '/edit-post', '/admin'];
 
+const scaffoldedRouteTitles = {
+  '/login': 'Login | Travel Blog Platform',
+  '/register': 'Register | Travel Blog Platform',
+  '/create-post': 'Create Post | Travel Blog Platform',
+  '/post-details': 'Post Details | Travel Blog Platform',
+  '/edit-post': 'Edit Post | Travel Blog Platform',
+  '/admin': 'Admin | Travel Blog Platform'
+};
+
 function getScaffoldMessage(pathname, searchParams) {
   const id = searchParams.get('id');
   const idLine = id ? `<p class="mb-0">Requested id: <strong>${id}</strong></p>` : '';
 
   return {
+    title: scaffoldedRouteTitles[pathname] ?? 'Travel Blog Platform',
     html: `
       <section class="text-center py-5">
         <h1 class="h3">Route scaffolded: ${pathname}</h1>
@@ -36,6 +46,7 @@ export function resolveRoute(location) {
   }
 
   return {
+    title: 'Not Found | Travel Blog Platform',
     html: `
       <section class="text-center py-5">
         <h1 class="h3">404 - Not Found</h1>
