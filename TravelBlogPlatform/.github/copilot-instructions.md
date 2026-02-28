@@ -43,7 +43,7 @@ Use modular code structure, with separate files for different components, pages 
   - After applying a migration in Supabase, keep a copy of the migration SQL file in the code.
 
   ## Authentication and Authorization
-
+  
   - Use Supabase Auth for user authentication and authorization.
   - Implement RLS policies to restrict access to data based on user roles and permissions.
   - Implement user roles with a separate DB table (e.g. admin, user).
