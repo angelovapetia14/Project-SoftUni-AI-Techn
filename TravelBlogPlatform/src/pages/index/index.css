@@ -1,3 +1,39 @@
-.display-6 {
-  font-weight: 600;
+.hero-section {
+  min-height: 420px;
+  background-image: linear-gradient(rgba(13, 59, 117, 0.35), rgba(13, 59, 117, 0.35)),
+    url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  backdrop-filter: saturate(110%);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.search-box {
+  max-width: 720px;
+}
+
+.search-box .form-control:focus {
+  box-shadow: none;
+}
+
+.post-image {
+  height: 220px;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 360px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
 }

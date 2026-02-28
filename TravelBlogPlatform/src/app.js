@@ -19,6 +19,14 @@ function renderApp() {
 
   route.attach?.();
 
+  appElement.querySelectorAll('[data-action="logout"]').forEach((button) => {
+    button.addEventListener('click', () => {
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('role');
+      navigateTo('/');
+    });
+  });
+
   appElement.querySelectorAll('[data-link]').forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault();

@@ -1,3 +1,11 @@
 .navbar-brand {
   letter-spacing: 0.02em;
 }
+
+.navbar-nav .nav-link {
+  font-weight: 600;
+}
+
+.navbar-nav .nav-link[aria-current='page'] {
+  color: var(--bs-primary);
+}

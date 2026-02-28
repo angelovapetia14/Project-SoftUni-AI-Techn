@@ -1,9 +1,21 @@
 <header class="bg-white border-bottom">
   <nav class="navbar navbar-expand-lg container py-3">
     <a class="navbar-brand fw-semibold" href="/" data-link>Travel Blog</a>
-    <div class="d-flex gap-2 ms-auto">
-      <a class="btn btn-outline-primary btn-sm" href="/" data-link>Home</a>
-      <a class="btn btn-primary btn-sm" href="/dashboard" data-link>Dashboard</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links"></ul>
+      <div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links"></div>
     </div>
   </nav>
 </header>
