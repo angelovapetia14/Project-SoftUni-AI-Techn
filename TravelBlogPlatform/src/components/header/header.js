@@ -7,6 +7,7 @@ function getSessionState() {
 
   return {
     isAuthenticated,
+    role,
     isAdmin: isAuthenticated && role === 'admin'
   };
 }
@@ -34,9 +35,15 @@ function getMainLinks(normalizedPath, isAdmin) {
     .join('');
 }
 
-function getAuthLinks(isAuthenticated) {
+function getAuthLinks(isAuthenticated, role) {
   if (isAuthenticated) {
-    return '<button class="btn btn-outline-danger btn-sm" type="button" data-action="logout">Logout</button>';
+    const badgeClass = role === 'admin' ? 'text-bg-primary' : 'text-bg-secondary';
+    const badgeLabel = role === 'admin' ? 'Admin' : 'User';
+
+    return `
+      <span class="badge ${badgeClass} align-self-center" aria-label="Current role">${badgeLabel}</span>
+      <button class="btn btn-outline-danger btn-sm" type="button" data-action="logout">Logout</button>
+    `;
   }
 
   return `
@@ -47,9 +54,9 @@ function getAuthLinks(isAuthenticated) {
 
 export function renderHeader(pathname) {
   const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
-  const { isAuthenticated, isAdmin } = getSessionState();
+  const { isAuthenticated, role, isAdmin } = getSessionState();
 
   return template
     .replace('<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links"></ul>', `<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links">${getMainLinks(normalizedPath, isAdmin)}</ul>`)
-    .replace('<div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links"></div>', `<div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links">${getAuthLinks(isAuthenticated)}</div>`);
+    .replace('<div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links"></div>', `<div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links">${getAuthLinks(isAuthenticated, role)}</div>`);
 }
