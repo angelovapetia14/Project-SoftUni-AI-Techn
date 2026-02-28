@@ -1,0 +1,54 @@
+<section class="create-post-page rounded-3 overflow-hidden shadow-sm bg-white">
+  <div class="row g-0">
+    <div class="col-lg-5 create-post-hero d-none d-lg-block"></div>
+
+    <div class="col-lg-7">
+      <div class="p-4 p-md-5">
+        <h1 class="h2 mb-4">Create Post</h1>
+
+        <form id="create-post-form" class="d-grid gap-3" novalidate>
+          <div>
+            <label for="create-title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="create-title" placeholder="Enter post title" required />
+          </div>
+
+          <div>
+            <label for="create-destination" class="form-label">Destination</label>
+            <input
+              type="text"
+              class="form-control"
+              id="create-destination"
+              placeholder="e.g. Bali, Japan, Italy"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="create-description" class="form-label">Description</label>
+            <textarea
+              class="form-control"
+              id="create-description"
+              rows="6"
+              placeholder="Write your travel story..."
+              required
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="create-image" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="create-image" accept="image/*" />
+          </div>
+
+          <div>
+            <p class="form-label mb-2">Preview Image</p>
+            <div class="image-preview border rounded-3 d-flex align-items-center justify-content-center" id="image-preview">
+              <p class="text-muted mb-0 px-3 text-center">No image selected</p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Create Post</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

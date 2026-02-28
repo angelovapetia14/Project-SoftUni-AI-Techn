@@ -1,0 +1,24 @@
+.post-hero {
+  height: 340px;
+  background-size: cover;
+  background-position: center;
+}
+
+.post-destination {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--bs-primary);
+  background: rgba(var(--bs-primary-rgb), 0.08);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+}
+
+.post-description {
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .post-hero {
+    height: 240px;
+  }
+}

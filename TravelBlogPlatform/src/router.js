@@ -2,15 +2,19 @@ import { getIndexPage } from './pages/index/index.js';
 import { getDashboardPage } from './pages/dashboard/dashboard.js';
 import { getLoginPage } from './pages/login/login.js';
 import { getRegisterPage } from './pages/register/register.js';
+import { getCreatePostPage } from './pages/create-post/create-post.js';
+import { getPostDetailsPage } from './pages/post-details/post-details.js';
 
 const implementedRoutes = {
   '/': getIndexPage,
   '/dashboard': getDashboardPage,
   '/login': getLoginPage,
-  '/register': getRegisterPage
+  '/register': getRegisterPage,
+  '/create-post': getCreatePostPage,
+  '/post-details': getPostDetailsPage
 };
 
-const scaffoldedRoutes = ['/create-post', '/post-details', '/edit-post', '/admin'];
+const scaffoldedRoutes = ['/edit-post', '/admin'];
 
 const scaffoldedRouteTitles = {
   '/login': 'Login | Travel Blog Platform',
