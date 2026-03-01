@@ -4,6 +4,44 @@ import { login } from '../../js/auth.js';
 import { showError } from '../../js/toast.js';
 import { navigateTo } from '../../router.js';
 
+function setInlineError(message) {
+  const errorContainer = document.getElementById('login-error');
+
+  if (!errorContainer) {
+    return;
+  }
+
+  if (!message) {
+    errorContainer.textContent = '';
+    errorContainer.classList.add('d-none');
+    return;
+  }
+
+  errorContainer.textContent = message;
+  errorContainer.classList.remove('d-none');
+}
+
+function getLoginErrorMessage(error) {
+  const fallbackMessage = 'Login failed. Please try again.';
+  const errorMessage = error?.message ?? fallbackMessage;
+  const normalizedMessage = errorMessage.toLowerCase();
+
+  if (normalizedMessage.includes('invalid login credentials')) {
+    return 'Wrong email or password.';
+  }
+
+  if (normalizedMessage.includes('password')) {
+    return 'Wrong password. Please try again.';
+  }
+
+  return errorMessage;
+}
+
+function showLoginError(message) {
+  setInlineError(message);
+  showError(message);
+}
+
 function setLoginLoadingState({ isLoading, submitButton, inputs, defaultButtonText }) {
   if (!submitButton) {
     return;
@@ -38,6 +76,8 @@ export function getLoginPage() {
 
       form?.addEventListener('submit', async (event) => {
         event.preventDefault();
+        setInlineError('');
+
         setLoginLoadingState({
           isLoading: true,
           submitButton,
@@ -60,8 +100,14 @@ export function getLoginPage() {
             defaultButtonText
           });
 
-          showError(error.message || 'Invalid email or password.');
+          showLoginError(getLoginErrorMessage(error));
         }
+      });
+
+      [emailInput, passwordInput].forEach((inputElement) => {
+        inputElement?.addEventListener('input', () => {
+          setInlineError('');
+        });
       });
     }
   };

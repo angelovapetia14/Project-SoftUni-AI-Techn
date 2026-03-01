@@ -32,6 +32,22 @@ function showRegistrationError(message) {
   console.error(message);
 }
 
+function getRegisterErrorMessage(error) {
+  const fallbackMessage = 'Registration failed. Please try again.';
+  const errorMessage = error?.message ?? fallbackMessage;
+  const normalizedMessage = errorMessage.toLowerCase();
+
+  if (normalizedMessage.includes('password')) {
+    if (normalizedMessage.includes('least') || normalizedMessage.includes('character') || normalizedMessage.includes('weak')) {
+      return 'Invalid password. Password must be at least 6 characters long.';
+    }
+
+    return 'Invalid password. Please enter a stronger password.';
+  }
+
+  return errorMessage;
+}
+
 function setRegisterLoadingState({ isLoading, submitButton, inputs, defaultButtonText }) {
   if (!submitButton) {
     return;
@@ -74,12 +90,12 @@ export function getRegisterPage() {
         const confirmPassword = confirmPasswordInput?.value ?? '';
 
         if (password.length < 6) {
-          showRegistrationError('Password must be at least 6 characters long.');
+          showRegistrationError('Invalid password. Password must be at least 6 characters long.');
           return;
         }
 
         if (password !== confirmPassword) {
-          showRegistrationError('Passwords do not match.');
+          showRegistrationError('Incorrect password confirmation. Passwords do not match.');
           return;
         }
 
@@ -104,7 +120,7 @@ export function getRegisterPage() {
             defaultButtonText
           });
 
-          showRegistrationError(error.message || 'Registration failed. Please try again.');
+          showRegistrationError(getRegisterErrorMessage(error));
         }
       });
 
