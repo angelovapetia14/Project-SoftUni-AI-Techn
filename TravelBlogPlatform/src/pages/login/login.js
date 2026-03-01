@@ -1,6 +1,26 @@
 import template from './login.html?raw';
 import './login.css';
 
+function setLoginLoadingState({ isLoading, submitButton, inputs, defaultButtonText }) {
+  if (!submitButton) {
+    return;
+  }
+
+  submitButton.disabled = isLoading;
+  submitButton.setAttribute('aria-busy', String(isLoading));
+  submitButton.innerHTML = isLoading
+    ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing in...'
+    : defaultButtonText;
+
+  inputs.forEach((inputElement) => {
+    if (!inputElement) {
+      return;
+    }
+
+    inputElement.disabled = isLoading;
+  });
+}
+
 function navigateHome() {
   window.history.pushState({}, '', '/');
   window.dispatchEvent(new Event('app:navigate'));
@@ -13,17 +33,39 @@ export function getLoginPage() {
     attach() {
       const form = document.getElementById('login-form');
       const emailInput = document.getElementById('login-email');
+      const passwordInput = document.getElementById('login-password');
+      const submitButton = form?.querySelector('button[type="submit"]');
+      const defaultButtonText = submitButton?.textContent ?? 'Login';
+      const formInputs = [emailInput, passwordInput];
 
-      form?.addEventListener('submit', (event) => {
+      form?.addEventListener('submit', async (event) => {
         event.preventDefault();
+        setLoginLoadingState({
+          isLoading: true,
+          submitButton,
+          inputs: formInputs,
+          defaultButtonText
+        });
 
         const email = (emailInput?.value ?? '').trim().toLowerCase();
         const role = email.includes('admin') ? 'admin' : 'user';
 
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('role', role);
+        try {
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('role', role);
 
-        navigateHome();
+          await new Promise((resolve) => setTimeout(resolve, 600));
+          navigateHome();
+        } catch (error) {
+          setLoginLoadingState({
+            isLoading: false,
+            submitButton,
+            inputs: formInputs,
+            defaultButtonText
+          });
+
+          console.error(error);
+        }
       });
     }
   };

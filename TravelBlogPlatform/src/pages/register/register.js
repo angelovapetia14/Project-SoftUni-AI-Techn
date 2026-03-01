@@ -32,6 +32,26 @@ function showRegistrationError(message) {
   console.error(message);
 }
 
+function setRegisterLoadingState({ isLoading, submitButton, inputs, defaultButtonText }) {
+  if (!submitButton) {
+    return;
+  }
+
+  submitButton.disabled = isLoading;
+  submitButton.setAttribute('aria-busy', String(isLoading));
+  submitButton.innerHTML = isLoading
+    ? '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Registering...'
+    : defaultButtonText;
+
+  inputs.forEach((inputElement) => {
+    if (!inputElement) {
+      return;
+    }
+
+    inputElement.disabled = isLoading;
+  });
+}
+
 export function getRegisterPage() {
   return {
     title: 'Register | Travel Blog Platform',
@@ -41,6 +61,9 @@ export function getRegisterPage() {
       const emailInput = document.getElementById('register-email');
       const passwordInput = document.getElementById('register-password');
       const confirmPasswordInput = document.getElementById('register-confirm-password');
+      const submitButton = form?.querySelector('button[type="submit"]');
+      const defaultButtonText = submitButton?.textContent ?? 'Register';
+      const formInputs = [emailInput, passwordInput, confirmPasswordInput];
 
       form?.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -61,12 +84,26 @@ export function getRegisterPage() {
         }
 
         try {
+          setRegisterLoadingState({
+            isLoading: true,
+            submitButton,
+            inputs: formInputs,
+            defaultButtonText
+          });
+
           await register(email, password);
           showSuccess('Registration successful. Redirecting to login...');
           setTimeout(() => {
             navigateTo('/login');
           }, 800);
         } catch (error) {
+          setRegisterLoadingState({
+            isLoading: false,
+            submitButton,
+            inputs: formInputs,
+            defaultButtonText
+          });
+
           showRegistrationError(error.message || 'Registration failed. Please try again.');
         }
       });
