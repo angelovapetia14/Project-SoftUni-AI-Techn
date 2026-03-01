@@ -1,5 +1,8 @@
 import template from './login.html?raw';
 import './login.css';
+import { login } from '../../js/auth.js';
+import { showError } from '../../js/toast.js';
+import { navigateTo } from '../../router.js';
 
 function setLoginLoadingState({ isLoading, submitButton, inputs, defaultButtonText }) {
   if (!submitButton) {
@@ -19,11 +22,6 @@ function setLoginLoadingState({ isLoading, submitButton, inputs, defaultButtonTe
 
     inputElement.disabled = isLoading;
   });
-}
-
-function navigateHome() {
-  window.history.pushState({}, '', '/');
-  window.dispatchEvent(new Event('app:navigate'));
 }
 
 export function getLoginPage() {
@@ -48,14 +46,12 @@ export function getLoginPage() {
         });
 
         const email = (emailInput?.value ?? '').trim().toLowerCase();
-        const role = email.includes('admin') ? 'admin' : 'user';
 
         try {
+          const { role } = await login(email, passwordInput?.value ?? '');
           localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('role', role);
-
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          navigateHome();
+          localStorage.setItem('role', role ?? 'user');
+          navigateTo('/dashboard.html');
         } catch (error) {
           setLoginLoadingState({
             isLoading: false,
@@ -64,7 +60,7 @@ export function getLoginPage() {
             defaultButtonText
           });
 
-          console.error(error);
+          showError(error.message || 'Invalid email or password.');
         }
       });
     }

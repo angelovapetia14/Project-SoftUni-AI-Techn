@@ -9,7 +9,9 @@ import { getAdminPage } from './pages/admin/admin.js';
 const implementedRoutes = {
   '/': getIndexPage,
   '/dashboard': getDashboardPage,
+  '/dashboard.html': getDashboardPage,
   '/login': getLoginPage,
+  '/login.html': getLoginPage,
   '/register': getRegisterPage,
   '/create-post': getCreatePostPage,
   '/post-details': getPostDetailsPage,

@@ -41,3 +41,66 @@ export async function register(email, password) {
 
   return user;
 }
+
+export async function login(email, password) {
+  const supabase = assertSupabaseClient();
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const user = data.user;
+
+  if (!user) {
+    throw new Error('Login failed. Please try again.');
+  }
+
+  let role = 'user';
+  const { data: profileData, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profileError && profileData?.role) {
+    role = profileData.role;
+  }
+
+  return { user, role };
+}
+
+export async function getSession() {
+  const supabase = assertSupabaseClient();
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.session;
+}
+
+export async function getCurrentUser() {
+  const supabase = assertSupabaseClient();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.user;
+}
+
+export async function logout() {
+  const supabase = assertSupabaseClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    throw error;
+  }
+}

@@ -1,6 +1,7 @@
 import { renderHeader } from './components/header/header.js';
 import { renderFooter } from './components/footer/footer.js';
 import { resolveRoute, navigateTo } from './router.js';
+import { logout } from './js/auth.js';
 
 function getPathname() {
   return window.location.pathname;
@@ -20,7 +21,12 @@ function renderApp() {
   route.attach?.();
 
   appElement.querySelectorAll('[data-action="logout"]').forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
+      try {
+        await logout();
+      } catch {
+      }
+
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('role');
       navigateTo('/');
