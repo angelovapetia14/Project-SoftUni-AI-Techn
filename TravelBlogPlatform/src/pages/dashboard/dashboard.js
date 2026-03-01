@@ -6,8 +6,8 @@ export function getDashboardPage() {
   return {
     title: 'Dashboard | Travel Blog Platform',
     html: template,
-    attach() {
-      initDashboard();
+    async attach() {
+      await initDashboard();
     }
   };
 }

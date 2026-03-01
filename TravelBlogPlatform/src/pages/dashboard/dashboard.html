@@ -1,4 +1,43 @@
-<section class="p-4 p-md-5 bg-white rounded-3 shadow-sm">
-  <h1 class="h2">Dashboard</h1>
-  <p class="mb-0">This is the dashboard page mapped to <strong>/dashboard</strong>.</p>
+<section class="dashboard-hero rounded-3 overflow-hidden mb-4">
+  <div class="dashboard-hero-overlay p-4 p-md-5 text-white">
+    <h1 class="display-6 fw-semibold mb-2">Welcome to your Dashboard</h1>
+    <p class="lead mb-4">Manage your travel stories, create new posts, and keep your blog fresh.</p>
+
+    <div class="d-flex flex-wrap gap-2">
+      <a href="/create-post.html" data-link class="btn btn-primary">Create New Post</a>
+      <a href="/index.html" data-link class="btn btn-light">Back to Home</a>
+    </div>
+  </div>
+</section>
+
+<section class="row g-4">
+  <div class="col-12 col-md-6 col-lg-4">
+    <article class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body p-4">
+        <p class="text-uppercase small fw-semibold text-primary mb-2">Total Posts</p>
+        <p class="dashboard-stat mb-2" id="dashboard-posts-count">—</p>
+        <p class="text-muted mb-0">Published travel stories currently available in your platform.</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <article class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body p-4">
+        <p class="text-uppercase small fw-semibold text-primary mb-2">Total Comments</p>
+        <p class="dashboard-stat mb-2" id="dashboard-comments-count">—</p>
+        <p class="text-muted mb-0">Community engagement across all posts in the application.</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="col-12 col-md-6 col-lg-4">
+    <article class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body p-4">
+        <p class="text-uppercase small fw-semibold text-primary mb-2">Quick Tip</p>
+        <h2 class="h4 mb-2">Keep stories active</h2>
+        <p class="text-muted mb-0">Add fresh destinations regularly to keep readers engaged and returning.</p>
+      </div>
+    </article>
+  </div>
 </section>

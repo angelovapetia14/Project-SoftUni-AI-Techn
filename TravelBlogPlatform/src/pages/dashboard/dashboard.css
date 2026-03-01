@@ -1,3 +1,36 @@
-.h2 {
-  font-weight: 600;
+.dashboard-hero {
+  min-height: 300px;
+  background-image: linear-gradient(rgba(13, 59, 117, 0.45), rgba(13, 59, 117, 0.45)),
+    url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center center;
+}
+
+.dashboard-hero-overlay {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dashboard-card {
+  transition: transform 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+}
+
+.dashboard-stat {
+  font-size: 2.1rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--bs-dark);
+}
+
+@media (max-width: 768px) {
+  .dashboard-hero,
+  .dashboard-hero-overlay {
+    min-height: 240px;
+  }
 }

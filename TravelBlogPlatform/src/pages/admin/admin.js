@@ -1,5 +1,6 @@
 import template from './admin.html?raw';
 import './admin.css';
+import { requireAdmin } from '../../js/guards.js';
 
 const adminPosts = [
   { id: 1, title: 'Journey Through Japan', author: 'Jivko', destination: 'Japan' },
@@ -40,7 +41,13 @@ export function getAdminPage() {
   return {
     title: 'Admin Dashboard | Travel Blog Platform',
     html: template,
-    attach() {
+    async attach() {
+      const user = await requireAdmin();
+
+      if (!user) {
+        return;
+      }
+
       renderTable();
     }
   };

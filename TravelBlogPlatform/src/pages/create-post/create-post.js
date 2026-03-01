@@ -1,5 +1,6 @@
 import template from './create-post.html?raw';
 import './create-post.css';
+import { requireAuth } from '../../js/guards.js';
 
 function renderImagePreview(file) {
   const previewElement = document.getElementById('image-preview');
@@ -24,7 +25,13 @@ export function getCreatePostPage() {
   return {
     title: 'Create Post | Travel Blog Platform',
     html: template,
-    attach() {
+    async attach() {
+      const user = await requireAuth();
+
+      if (!user) {
+        return;
+      }
+
       const form = document.getElementById('create-post-form');
       const imageInput = document.getElementById('create-image');
 
