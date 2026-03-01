@@ -12,11 +12,12 @@ function getSessionState() {
   };
 }
 
-function getMainLinks(normalizedPath, isAdmin) {
-  const links = [
-    { href: '/', label: 'Home' },
-    { href: '/create-post', label: 'Create Post' }
-  ];
+function getMainLinks(normalizedPath, isAuthenticated, isAdmin) {
+  const links = [{ href: '/', label: 'Home' }];
+
+  if (isAuthenticated) {
+    links.push({ href: '/create-post', label: 'Create Post' });
+  }
 
   if (isAdmin) {
     links.push({ href: '/admin', label: 'Admin' });
@@ -57,6 +58,6 @@ export function renderHeader(pathname) {
   const { isAuthenticated, role, isAdmin } = getSessionState();
 
   return template
-    .replace('<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links"></ul>', `<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links">${getMainLinks(normalizedPath, isAdmin)}</ul>`)
+    .replace('<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links"></ul>', `<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" id="nav-main-links">${getMainLinks(normalizedPath, isAuthenticated, isAdmin)}</ul>`)
     .replace('<div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links"></div>', `<div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0" id="nav-auth-links">${getAuthLinks(isAuthenticated, role)}</div>`);
 }
