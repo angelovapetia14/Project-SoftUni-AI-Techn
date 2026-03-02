@@ -1,4 +1,51 @@
 <section class="p-4 p-md-5 bg-white rounded-3 shadow-sm">
-  <h1 class="h2 mb-3">Edit Post</h1>
-  <p class="mb-0">Edit Post page is protected and available only for authenticated users.</p>
+  <h1 class="h2 mb-4">Edit Post</h1>
+
+  <form id="edit-post-form" class="d-grid gap-3" novalidate>
+    <div>
+      <label for="edit-title" class="form-label">Title</label>
+      <input type="text" class="form-control" id="edit-title" placeholder="Enter post title" required />
+    </div>
+
+    <div>
+      <label for="edit-destination" class="form-label">Destination</label>
+      <input
+        type="text"
+        class="form-control"
+        id="edit-destination"
+        placeholder="e.g. Bali, Japan, Italy"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="edit-description" class="form-label">Description</label>
+      <textarea
+        class="form-control"
+        id="edit-description"
+        rows="6"
+        placeholder="Write your travel story..."
+        required
+      ></textarea>
+    </div>
+
+    <div>
+      <label for="edit-image" class="form-label">Upload New Image (optional)</label>
+      <input type="file" class="form-control" id="edit-image" accept="image/*" />
+    </div>
+
+    <div>
+      <label for="edit-travel-date" class="form-label">Travel Date (optional)</label>
+      <input type="date" class="form-control" id="edit-travel-date" />
+    </div>
+
+    <div>
+      <p class="form-label mb-2">Current Image</p>
+      <div class="image-preview border rounded-3 d-flex align-items-center justify-content-center" id="edit-image-preview">
+        <p class="text-muted mb-0 px-3 text-center">Няма качена снимка</p>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Post</button>
+  </form>
 </section>

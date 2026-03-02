@@ -1,6 +1,7 @@
 import template from './create-post.html?raw';
 import './create-post.css';
 import { requireAuth } from '../../js/guards.js';
+import { initCreatePostPage } from '../../js/createPostPage.js';
 
 function renderImagePreview(file) {
   const previewElement = document.getElementById('image-preview');
@@ -41,9 +42,7 @@ export function getCreatePostPage() {
         renderImagePreview(file);
       });
 
-      form?.addEventListener('submit', (event) => {
-        event.preventDefault();
-      });
+      initCreatePostPage();
     }
   };
 }
