@@ -108,9 +108,9 @@ export function getRegisterPage() {
           });
 
           await register(email, password);
-          showSuccess('Registration successful. Redirecting to login...');
+          showSuccess('Registration successful. Redirecting to home...');
           setTimeout(() => {
-            navigateTo('/login.html');
+            navigateTo('/index.html');
           }, 800);
         } catch (error) {
           setRegisterLoadingState({
