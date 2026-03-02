@@ -1,5 +1,6 @@
 import { assertSupabaseClient } from './supabaseClient.js';
 import { showError, showInfo, showSuccess } from './toast.js';
+import { getProfileRole } from './auth.js';
 
 const POST_IMAGES_BUCKET = 'post-images';
 const POSTS_FOLDER = 'posts';
@@ -182,19 +183,42 @@ async function getCurrentUserId() {
     throw new Error('You must be logged in');
   }
 
-  const username = user.email?.split('@')[0] ?? `user-${user.id.slice(0, 6)}`;
+  const { data: existingProfile, error: profileFetchError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle();
 
-  const { error: profileError } = await supabase.from('profiles').upsert({
-    id: user.id,
-    username,
-    role: 'user'
-  });
+  if (profileFetchError) {
+    throw profileFetchError;
+  }
 
-  if (profileError) {
-    throw profileError;
+  if (!existingProfile) {
+    const username = user.email?.split('@')[0] ?? `user-${user.id.slice(0, 6)}`;
+
+    const { error: profileError } = await supabase.from('profiles').insert({
+      id: user.id,
+      email: user.email,
+      username,
+      role: 'user'
+    });
+
+    if (profileError) {
+      throw profileError;
+    }
   }
 
   return user.id;
+}
+
+async function getCurrentUserContext() {
+  const currentUserId = await getCurrentUserId();
+  const role = await getProfileRole(currentUserId);
+
+  return {
+    userId: currentUserId,
+    role
+  };
 }
 
 async function insertPhotoRecord(postId, imageUrl, uploadedBy) {
@@ -322,10 +346,10 @@ export async function updatePost(postId, title, destination, description, imageF
     validatePostFields(title, destination, description);
 
     const supabase = assertSupabaseClient();
-    const currentUserId = await getCurrentUserId();
+    const { userId: currentUserId, role } = await getCurrentUserContext();
     const existingPost = await getPostById(postId);
 
-    if (existingPost.user_id !== currentUserId) {
+    if (existingPost.user_id !== currentUserId && role !== 'admin') {
       throw new Error('You are not allowed to edit this post');
     }
 

@@ -1,6 +1,7 @@
 import { getPostById, updatePost } from './posts.js';
 import { assertSupabaseClient } from './supabaseClient.js';
 import { showError } from './toast.js';
+import { getProfileRole } from './auth.js';
 
 function validateRequiredFields(fields) {
   let isValid = true;
@@ -91,8 +92,9 @@ export async function initEditPostPage() {
     }
 
     const post = await getPostById(postId);
+    const role = await getProfileRole(user.id);
 
-    if (post.user_id !== user.id) {
+    if (post.user_id !== user.id && role !== 'admin') {
       throw new Error('You are not allowed to edit this post');
     }
 
