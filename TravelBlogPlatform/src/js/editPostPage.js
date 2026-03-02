@@ -2,6 +2,22 @@ import { getPostById, updatePost } from './posts.js';
 import { assertSupabaseClient } from './supabaseClient.js';
 import { showError } from './toast.js';
 
+function validateRequiredFields(fields) {
+  let isValid = true;
+
+  fields.forEach((field) => {
+    const hasValue = Boolean(field?.value?.trim());
+
+    field?.classList.toggle('is-invalid', !hasValue);
+
+    if (!hasValue) {
+      isValid = false;
+    }
+  });
+
+  return isValid;
+}
+
 function renderImagePreview(url) {
   const previewElement = document.getElementById('edit-image-preview');
 
@@ -41,10 +57,22 @@ export async function initEditPostPage() {
 
   const form = document.getElementById('edit-post-form');
   const imageInput = document.getElementById('edit-image');
+  const titleInput = document.getElementById('edit-title');
+  const destinationInput = document.getElementById('edit-destination');
+  const descriptionInput = document.getElementById('edit-description');
+  const travelDateInput = document.getElementById('edit-travel-date');
 
   if (!form) {
     return;
   }
+
+  [titleInput, destinationInput, descriptionInput].forEach((field) => {
+    field?.addEventListener('input', () => {
+      if (field.value.trim()) {
+        field.classList.remove('is-invalid');
+      }
+    });
+  });
 
   try {
     const supabase = assertSupabaseClient();
@@ -66,11 +94,6 @@ export async function initEditPostPage() {
     if (post.user_id !== user.id) {
       throw new Error('Нямате право да редактирате този пост');
     }
-
-    const titleInput = document.getElementById('edit-title');
-    const destinationInput = document.getElementById('edit-destination');
-    const descriptionInput = document.getElementById('edit-description');
-    const travelDateInput = document.getElementById('edit-travel-date');
 
     if (titleInput) {
       titleInput.value = post.title ?? '';
@@ -105,10 +128,17 @@ export async function initEditPostPage() {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    const title = document.getElementById('edit-title')?.value ?? '';
-    const destination = document.getElementById('edit-destination')?.value ?? '';
-    const description = document.getElementById('edit-description')?.value ?? '';
-    const travelDate = document.getElementById('edit-travel-date')?.value ?? '';
+    const requiredFields = [titleInput, destinationInput, descriptionInput];
+
+    if (!validateRequiredFields(requiredFields)) {
+      showError('Попълнете всички задължителни полета.');
+      return;
+    }
+
+    const title = titleInput?.value ?? '';
+    const destination = destinationInput?.value ?? '';
+    const description = descriptionInput?.value ?? '';
+    const travelDate = travelDateInput?.value ?? '';
     const imageFile = imageInput?.files?.[0] ?? null;
 
     try {

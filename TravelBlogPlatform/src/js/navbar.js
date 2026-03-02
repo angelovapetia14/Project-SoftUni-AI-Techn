@@ -21,7 +21,7 @@ function getMainLinks(role) {
   return links;
 }
 
-function getAuthLinks(role) {
+function getAuthLinks(role, userLabel = '') {
   if (role === 'guest') {
     return `
       <a class="btn btn-outline-primary btn-sm" href="/login.html" data-link>Login</a>
@@ -29,7 +29,12 @@ function getAuthLinks(role) {
     `;
   }
 
-  return '<a class="btn btn-outline-danger btn-sm" href="#" data-action="logout">Logout</a>';
+  const safeLabel = userLabel || 'User';
+
+  return `
+    <span class="badge text-bg-light border d-inline-flex align-items-center">${safeLabel}</span>
+    <a class="btn btn-outline-danger btn-sm" href="#" data-action="logout">Logout</a>
+  `;
 }
 
 function renderMainLinks(pathname, role) {
@@ -68,21 +73,24 @@ export async function renderNavbar(pathname = window.location.pathname) {
   }
 
   let role = 'guest';
+  let userLabel = '';
 
   try {
     const user = await getCurrentUser();
 
     if (user) {
       role = await getProfileRole(user.id);
+      userLabel = user.email ?? user.id;
     }
   } catch {
     role = 'guest';
+    userLabel = '';
   }
 
   setSessionUiState(role);
 
   mainLinksElement.innerHTML = renderMainLinks(pathname, role);
-  authLinksElement.innerHTML = getAuthLinks(role);
+  authLinksElement.innerHTML = getAuthLinks(role, userLabel);
 
   const logoutLink = authLinksElement.querySelector('[data-action="logout"]');
 

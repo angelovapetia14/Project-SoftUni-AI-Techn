@@ -1,14 +1,15 @@
 <section class="p-4 p-md-5 bg-white rounded-3 shadow-sm">
   <h1 class="h2 mb-4">Edit Post</h1>
+  <p class="text-muted small mb-3">Полетата с <span class="text-danger">*</span> са задължителни.</p>
 
   <form id="edit-post-form" class="d-grid gap-3" novalidate>
     <div>
-      <label for="edit-title" class="form-label">Title</label>
+      <label for="edit-title" class="form-label">Title <span class="text-danger">*</span></label>
       <input type="text" class="form-control" id="edit-title" placeholder="Enter post title" required />
     </div>
 
     <div>
-      <label for="edit-destination" class="form-label">Destination</label>
+      <label for="edit-destination" class="form-label">Destination <span class="text-danger">*</span></label>
       <input
         type="text"
         class="form-control"
@@ -19,7 +20,7 @@
     </div>
 
     <div>
-      <label for="edit-description" class="form-label">Description</label>
+      <label for="edit-description" class="form-label">Description <span class="text-danger">*</span></label>
       <textarea
         class="form-control"
         id="edit-description"

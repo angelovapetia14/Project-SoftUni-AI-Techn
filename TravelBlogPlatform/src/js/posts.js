@@ -3,6 +3,111 @@ import { showError, showInfo, showSuccess } from './toast.js';
 
 const POST_IMAGES_BUCKET = 'post-images';
 const POSTS_FOLDER = 'posts';
+const MAX_IMAGE_WIDTH = 1600;
+const MAX_IMAGE_HEIGHT = 1200;
+const IMAGE_QUALITY = 0.85;
+
+function getScaledDimensions(width, height, maxWidth, maxHeight) {
+  if (width <= maxWidth && height <= maxHeight) {
+    return { width, height };
+  }
+
+  const widthRatio = maxWidth / width;
+  const heightRatio = maxHeight / height;
+  const ratio = Math.min(widthRatio, heightRatio);
+
+  return {
+    width: Math.round(width * ratio),
+    height: Math.round(height * ratio)
+  };
+}
+
+async function loadImageFromFile(file) {
+  return await new Promise((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Неуспешно зареждане на изображението.'));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
+function getFileExtensionFromMime(mimeType) {
+  if (mimeType === 'image/jpeg') {
+    return 'jpg';
+  }
+
+  if (mimeType === 'image/png') {
+    return 'png';
+  }
+
+  if (mimeType === 'image/webp') {
+    return 'webp';
+  }
+
+  return 'jpg';
+}
+
+async function resizeAndScaleImage(file) {
+  if (!file?.type?.startsWith('image/')) {
+    return file;
+  }
+
+  const image = await loadImageFromFile(file);
+  const scaled = getScaledDimensions(image.width, image.height, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+
+  if (scaled.width === image.width && scaled.height === image.height) {
+    return file;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = scaled.width;
+  canvas.height = scaled.height;
+
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    throw new Error('Неуспешно оразмеряване на изображението.');
+  }
+
+  context.drawImage(image, 0, 0, scaled.width, scaled.height);
+
+  const outputType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)
+    ? file.type
+    : 'image/jpeg';
+
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (value) => {
+        if (!value) {
+          reject(new Error('Неуспешно генериране на изображението.'));
+          return;
+        }
+
+        resolve(value);
+      },
+      outputType,
+      IMAGE_QUALITY
+    );
+  });
+
+  const extension = getFileExtensionFromMime(outputType);
+  const originalNameWithoutExtension = (file.name || 'image').replace(/\.[^/.]+$/, '');
+
+  return new File([blob], `${originalNameWithoutExtension}.${extension}`, {
+    type: outputType,
+    lastModified: Date.now()
+  });
+}
 
 export async function uploadImage(file) {
   if (!file) {
@@ -10,14 +115,15 @@ export async function uploadImage(file) {
   }
 
   const supabase = assertSupabaseClient();
+  const processedFile = await resizeAndScaleImage(file);
 
-  const originalName = file.name || 'image';
+  const originalName = processedFile.name || file.name || 'image';
   const uniqueFileName = `${Date.now()}-${originalName}`;
   const filePath = `${POSTS_FOLDER}/${uniqueFileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from(POST_IMAGES_BUCKET)
-    .upload(filePath, file);
+    .upload(filePath, processedFile);
 
   if (uploadError) {
     throw new Error(uploadError.message);
@@ -91,6 +197,24 @@ async function getCurrentUserId() {
   return user.id;
 }
 
+async function insertPhotoRecord(postId, imageUrl, uploadedBy) {
+  if (!postId || !imageUrl || !uploadedBy) {
+    return;
+  }
+
+  const supabase = assertSupabaseClient();
+
+  const { error } = await supabase.from('photos').insert({
+    post_id: postId,
+    image_url: imageUrl,
+    uploaded_by: uploadedBy
+  });
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getPostById(postId) {
   if (!postId) {
     throw new Error('Липсва ID на публикация');
@@ -151,7 +275,11 @@ export async function createPost(title, destination, description, imageFile, tra
       user_id: currentUserId
     };
 
-    let { error } = await supabase.from('posts').insert(payload);
+    let insertedPostId = null;
+
+    let { data: insertedPost, error } = await supabase.from('posts').insert(payload).select('id').single();
+
+    insertedPostId = insertedPost?.id ?? null;
 
     if (
       error &&
@@ -164,11 +292,16 @@ export async function createPost(title, destination, description, imageFile, tra
         user_id: payload.user_id
       };
 
-      ({ error } = await supabase.from('posts').insert(fallbackPayload));
+      ({ data: insertedPost, error } = await supabase.from('posts').insert(fallbackPayload).select('id').single());
+      insertedPostId = insertedPost?.id ?? null;
     }
 
     if (error) {
       throw error;
+    }
+
+    if (imageUrl && insertedPostId) {
+      await insertPhotoRecord(insertedPostId, imageUrl, currentUserId);
     }
 
     showSuccess('Публикацията е създадена');
@@ -227,6 +360,10 @@ export async function updatePost(postId, title, destination, description, imageF
 
     if (error) {
       throw error;
+    }
+
+    if (imageFile && imageUrl) {
+      await insertPhotoRecord(postId, imageUrl, currentUserId);
     }
 
     showSuccess('Публикацията е обновена');
