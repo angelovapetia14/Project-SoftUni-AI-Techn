@@ -26,6 +26,18 @@ function getLoginErrorMessage(error) {
   const errorMessage = error?.message ?? fallbackMessage;
   const normalizedMessage = errorMessage.toLowerCase();
 
+  if (
+    normalizedMessage.includes('change password') ||
+    normalizedMessage.includes('password change') ||
+    normalizedMessage.includes('password should be changed') ||
+    normalizedMessage.includes('password needs to be changed') ||
+    normalizedMessage.includes('needs to reset') ||
+    normalizedMessage.includes('update your password') ||
+    normalizedMessage.includes('reset your password')
+  ) {
+    return '';
+  }
+
   if (normalizedMessage.includes('invalid login credentials')) {
     return 'Wrong email or password.';
   }
@@ -38,6 +50,11 @@ function getLoginErrorMessage(error) {
 }
 
 function showLoginError(message) {
+  if (!message) {
+    setInlineError('');
+    return;
+  }
+
   setInlineError(message);
   showError(message);
 }

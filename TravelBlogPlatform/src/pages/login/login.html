@@ -6,15 +6,15 @@
 
         <div id="login-error" class="alert alert-danger d-none" role="alert"></div>
 
-        <form id="login-form" class="d-grid gap-3" novalidate>
+        <form id="login-form" class="d-grid gap-3" novalidate autocomplete="on">
           <div>
             <label for="login-email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="login-email" placeholder="name@example.com" required />
+            <input type="email" class="form-control" id="login-email" placeholder="name@example.com" autocomplete="username" required />
           </div>
 
           <div>
             <label for="login-password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="login-password" placeholder="••••••••" required />
+            <input type="password" class="form-control" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
           </div>
 
           <button type="submit" class="btn btn-primary w-100">Login</button>
