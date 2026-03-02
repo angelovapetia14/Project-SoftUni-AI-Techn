@@ -96,6 +96,31 @@ function renderComments(comments, currentUserId) {
   commentsList.innerHTML = comments.map((comment) => getCommentItem(comment, currentUserId)).join('');
 }
 
+function scrollToHighlightedComment(commentId) {
+  if (!commentId) {
+    return false;
+  }
+
+  const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+
+  if (!commentElement) {
+    return false;
+  }
+
+  commentElement.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+
+  commentElement.classList.add('comment-item-highlight');
+
+  window.setTimeout(() => {
+    commentElement.classList.remove('comment-item-highlight');
+  }, 2500);
+
+  return true;
+}
+
 async function loadAndRenderComments(postId, currentUserId) {
   const comments = await getCommentsByPostId(postId);
   renderComments(comments, currentUserId);
@@ -229,6 +254,7 @@ function renderPostDetails(post, isOwner) {
 export async function initPostDetailsPage() {
   const searchParams = new URLSearchParams(window.location.search);
   const postId = searchParams.get('id');
+  const commentId = searchParams.get('commentId');
 
   if (!postId) {
     showError('Missing post ID');
@@ -247,6 +273,12 @@ export async function initPostDetailsPage() {
     setupCommentForm(postId, userContext.userId);
     setupCommentActions(postId, userContext.userId);
     await loadAndRenderComments(postId, userContext.userId);
+
+    if (commentId) {
+      window.requestAnimationFrame(() => {
+        scrollToHighlightedComment(commentId);
+      });
+    }
 
     if (!isOwner) {
       return;

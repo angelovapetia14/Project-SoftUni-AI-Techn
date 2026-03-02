@@ -1,4 +1,5 @@
 import { getCurrentUser, getProfileRole } from './auth.js';
+import { navigateTo } from '../router.js';
 import { showError, showInfo } from './toast.js';
 import {
   deleteCommentAdmin,
@@ -154,6 +155,7 @@ function showModal(title, content) {
   const modalBody = document.getElementById('admin-view-modal-body');
 
   if (!modalElement || !modalTitle || !modalBody) {
+    window.alert(`${title}\n\n${String(content).replace(/<[^>]*>/g, '')}`);
     return;
   }
 
@@ -161,6 +163,7 @@ function showModal(title, content) {
   modalBody.innerHTML = content;
 
   if (!window.bootstrap?.Modal) {
+    window.alert(`${title}\n\n${modalBody.textContent ?? ''}`);
     return;
   }
 
@@ -254,14 +257,12 @@ export async function initAdminDashboard() {
           return;
         }
 
-        showModal(
-          'Comment details',
-          `
-            <p class="mb-2"><strong>Post:</strong> ${escapeHtml(getCommentPostTitle(comment))}</p>
-            <p class="mb-2"><strong>Author:</strong> ${escapeHtml(getCommentAuthor(comment))}</p>
-            <p class="mb-0"><strong>Content:</strong><br>${escapeHtml(comment.content)}</p>
-          `
-        );
+        if (!comment.post_id) {
+          showError('Missing post ID for this comment.');
+          return;
+        }
+
+        navigateTo(`/post-details.html?id=${encodeURIComponent(comment.post_id)}&commentId=${encodeURIComponent(comment.id)}`);
 
         return;
       }
@@ -350,10 +351,11 @@ export async function initAdminDashboard() {
 
       if (saveRoleButton) {
         const userId = saveRoleButton.getAttribute('data-id');
-        const roleSelect = usersTableBody.querySelector(`[data-role-select="${userId}"]`);
+        const row = saveRoleButton.closest('tr');
+        const roleSelect = row?.querySelector('[data-role-select]');
         const nextRole = roleSelect?.value;
 
-        if (!nextRole) {
+        if (!nextRole || !['user', 'admin'].includes(nextRole)) {
           showError('Missing role value.');
           return;
         }
