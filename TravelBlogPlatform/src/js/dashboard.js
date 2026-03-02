@@ -1,6 +1,7 @@
 import { requireAuth } from './guards.js';
 import { assertSupabaseClient } from './supabaseClient.js';
 import { showError } from './toast.js';
+import { initDashboardPosts } from './dashboardPosts.js';
 
 function updateStatElement(id, value) {
   const element = document.getElementById(id);
@@ -37,7 +38,7 @@ export async function initDashboard() {
   }
 
   try {
-    await loadDashboardStats();
+    await Promise.all([loadDashboardStats(), initDashboardPosts()]);
   } catch (error) {
     showError(error.message || 'Failed to load dashboard statistics.');
     updateStatElement('dashboard-posts-count', 0);

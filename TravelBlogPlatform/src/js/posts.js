@@ -113,6 +113,27 @@ export async function getPostById(postId) {
   }
 }
 
+export async function getAllPosts() {
+  const supabase = assertSupabaseClient();
+
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id, title, destination, description, image_url, created_at, travel_date, user_id')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return data ?? [];
+  } catch (error) {
+    const message = normalizeMessage(error, 'Неуспешно зареждане на публикациите.');
+    showError(message);
+    throw buildHandledError(message);
+  }
+}
+
 export async function createPost(title, destination, description, imageFile, travelDate) {
   try {
     validatePostFields(title, destination, description);
