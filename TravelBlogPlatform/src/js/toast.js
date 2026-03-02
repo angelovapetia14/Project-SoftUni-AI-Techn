@@ -54,3 +54,7 @@ export function showError(message) {
 export function showSuccess(message) {
   showToast(message, 'success');
 }
+
+export function showInfo(message) {
+  showSuccess(message);
+}

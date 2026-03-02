@@ -1,5 +1,5 @@
 import { assertSupabaseClient } from './supabaseClient.js';
-import { getAllPosts } from './posts.js';
+import { deletePost, getAllPosts } from './posts.js';
 import { showError } from './toast.js';
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/800x450?text=No+Image';
@@ -46,7 +46,10 @@ function getPostCard(post, currentUserId) {
             <a href="/post-details.html?id=${post.id}" data-link class="btn btn-primary">Read More</a>
             ${
               isOwner
-                ? `<a href="/edit-post.html?id=${post.id}" data-link class="btn btn-outline-primary">Edit</a>`
+                ? `
+                  <a href="/edit-post.html?id=${post.id}" data-link class="btn btn-outline-primary">Edit</a>
+                  <button type="button" class="btn btn-outline-danger" data-delete-post-id="${post.id}">Delete</button>
+                `
                 : ''
             }
           </div>
@@ -64,6 +67,36 @@ function renderEmpty(container) {
   `;
 }
 
+function bindDeleteEvents(container) {
+  if (container.dataset.deleteBound === 'true') {
+    return;
+  }
+
+  container.dataset.deleteBound = 'true';
+
+  container.addEventListener('click', async (event) => {
+    const target = event.target;
+    const deleteButton = target.closest('[data-delete-post-id]');
+
+    if (!deleteButton) {
+      return;
+    }
+
+    const postId = deleteButton.getAttribute('data-delete-post-id');
+    const confirmed = window.confirm('Сигурни ли сте?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deletePost(postId);
+    } catch (error) {
+      showError(error?.message || 'Неуспешно изтриване на публикацията.');
+    }
+  });
+}
+
 export async function initDashboardPosts() {
   const container = document.getElementById('dashboard-posts');
 
@@ -72,6 +105,8 @@ export async function initDashboardPosts() {
   }
 
   try {
+    bindDeleteEvents(container);
+
     const [posts, currentUserId] = await Promise.all([getAllPosts(), getCurrentUserId()]);
 
     if (!posts.length) {

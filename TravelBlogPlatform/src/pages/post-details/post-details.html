@@ -1,5 +1,15 @@
 <section class="post-details-page bg-white rounded-3 overflow-hidden shadow-sm">
   <div class="post-hero" id="post-details-hero"></div>
 
-  <div class="p-4 p-md-5" id="post-details-content"></div>
+  <div class="p-4 p-md-5" id="post-details-content">
+    <h1 class="display-6 fw-semibold mb-3" id="post-title"></h1>
+    <p class="post-destination mb-4" id="post-destination"></p>
+    <p class="post-description text-muted mb-4" id="post-description"></p>
+
+    <div class="d-flex flex-wrap gap-2">
+      <a href="/edit-post.html" data-link class="btn btn-primary" id="edit-btn">Edit</a>
+      <button id="delete-btn" class="btn btn-danger" type="button">Delete</button>
+      <a href="/index.html" data-link class="btn btn-outline-secondary">Back to Home</a>
+    </div>
+  </div>
 </section>

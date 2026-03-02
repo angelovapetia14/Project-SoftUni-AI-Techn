@@ -1,5 +1,5 @@
 import { assertSupabaseClient } from './supabaseClient.js';
-import { showError, showSuccess } from './toast.js';
+import { showError, showInfo, showSuccess } from './toast.js';
 
 const POST_IMAGES_BUCKET = 'post-images';
 const POSTS_FOLDER = 'posts';
@@ -238,4 +238,52 @@ export async function updatePost(postId, title, destination, description, imageF
     }
     throw buildHandledError(message);
   }
+}
+
+export async function deletePost(postId) {
+  if (!postId) {
+    throw new Error('Липсва ID на публикация');
+  }
+
+  const supabase = assertSupabaseClient();
+
+  const {
+    data: { user },
+    error: authError
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    throw new Error(authError.message || 'Трябва да сте логнати');
+  }
+
+  if (!user) {
+    throw new Error('Трябва да сте логнати');
+  }
+
+  const { data: post, error: postError } = await supabase
+    .from('posts')
+    .select('id, user_id')
+    .eq('id', postId)
+    .maybeSingle();
+
+  if (postError) {
+    throw new Error(postError.message || 'Неуспешно зареждане на публикацията.');
+  }
+
+  if (!post) {
+    throw new Error('Публикацията не е намерена');
+  }
+
+  if (post.user_id !== user.id) {
+    throw new Error('Нямате право да изтриете този пост');
+  }
+
+  const { error: deleteError } = await supabase.from('posts').delete().eq('id', postId);
+
+  if (deleteError) {
+    throw new Error(deleteError.message || 'Неуспешно изтриване на публикацията.');
+  }
+
+  showInfo('Публикацията е изтрита');
+  window.location.href = '/index.html';
 }
