@@ -17,6 +17,25 @@
   line-height: 1.7;
 }
 
+.comments-section {
+  max-width: 860px;
+}
+
+.comment-item {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: var(--bs-light);
+}
+
+.comment-meta {
+  font-size: 0.9rem;
+}
+
+.comment-content {
+  white-space: pre-wrap;
+}
+
 @media (max-width: 768px) {
   .post-hero {
     height: 240px;

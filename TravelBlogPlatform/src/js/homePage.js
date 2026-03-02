@@ -67,8 +67,7 @@ export async function initHomePage() {
     const posts = await getAllPosts();
     renderPosts(container, posts);
 
-    form?.addEventListener('submit', (event) => {
-      event.preventDefault();
+    const runFilter = () => {
       const query = normalizeText(searchInput?.value);
 
       if (!query) {
@@ -88,7 +87,14 @@ export async function initHomePage() {
       }
 
       renderPosts(container, filteredPosts);
+    };
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runFilter();
     });
+
+    searchInput?.addEventListener('input', runFilter);
   } catch (error) {
     if (!error?.toastShown) {
       showError(error?.message || 'Неуспешно зареждане на публикациите.');

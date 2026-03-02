@@ -11,5 +11,25 @@
       <button id="delete-btn" class="btn btn-danger" type="button">Delete</button>
       <a href="/index.html" data-link class="btn btn-outline-secondary">Back to Home</a>
     </div>
+
+    <section class="comments-section mt-5 pt-4 border-top">
+      <h2 class="h4 mb-3">Comments</h2>
+
+      <form id="comment-form" class="mb-4">
+        <div class="mb-2">
+          <textarea
+            id="comment-input"
+            class="form-control"
+            rows="3"
+            placeholder="Write a comment..."
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="comment-submit-btn">Add Comment</button>
+      </form>
+
+      <p class="text-muted mb-3 d-none" id="comment-guest-note">Влезте в профила си, за да коментирате.</p>
+
+      <div id="comments-list" class="d-grid gap-3"></div>
+    </section>
   </div>
 </section>

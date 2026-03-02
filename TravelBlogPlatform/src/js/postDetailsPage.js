@@ -1,6 +1,7 @@
 import { assertSupabaseClient } from './supabaseClient.js';
 import { deletePost, getPostById } from './posts.js';
 import { getProfileRole } from './auth.js';
+import { addComment, deleteComment, getCommentsByPostId, updateComment } from './comments.js';
 import { showError } from './toast.js';
 
 const FALLBACK_IMAGE = 'https://placehold.co/1600x900?text=No+Image';
@@ -43,6 +44,158 @@ function setDeleteButtonLoadingState(button, isLoading) {
 
   button.disabled = false;
   button.innerHTML = button.dataset.originalHtml || 'Delete';
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function formatAuthor(profile) {
+  return profile?.username || profile?.email || 'Unknown user';
+}
+
+function formatDate(value) {
+  if (!value) {
+    return '';
+  }
+
+  return new Date(value).toLocaleString();
+}
+
+function getCommentItem(comment, currentUserId) {
+  const isOwner = currentUserId && comment.user_id === currentUserId;
+
+  return `
+    <article class="comment-item" data-comment-id="${comment.id}">
+      <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
+        <p class="comment-meta text-muted mb-0">${escapeHtml(formatAuthor(comment.profiles))} • ${escapeHtml(formatDate(comment.created_at))}</p>
+        ${
+          isOwner
+            ? `
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-edit-comment-id="${comment.id}">Edit</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" data-delete-comment-id="${comment.id}">Delete</button>
+              </div>
+            `
+            : ''
+        }
+      </div>
+      <p class="comment-content mb-0" data-comment-content="${comment.id}">${escapeHtml(comment.content)}</p>
+    </article>
+  `;
+}
+
+function renderComments(comments, currentUserId) {
+  const commentsList = document.getElementById('comments-list');
+
+  if (!commentsList) {
+    return;
+  }
+
+  if (!comments.length) {
+    commentsList.innerHTML = '<p class="mb-0 text-muted">Все още няма коментари.</p>';
+    return;
+  }
+
+  commentsList.innerHTML = comments.map((comment) => getCommentItem(comment, currentUserId)).join('');
+}
+
+async function loadAndRenderComments(postId, currentUserId) {
+  const comments = await getCommentsByPostId(postId);
+  renderComments(comments, currentUserId);
+  return comments;
+}
+
+function setupCommentForm(postId, currentUserId) {
+  const form = document.getElementById('comment-form');
+  const input = document.getElementById('comment-input');
+  const submitButton = document.getElementById('comment-submit-btn');
+  const guestNote = document.getElementById('comment-guest-note');
+
+  if (!form || !input || !submitButton || !guestNote) {
+    return;
+  }
+
+  if (!currentUserId) {
+    form.classList.add('d-none');
+    guestNote.classList.remove('d-none');
+    return;
+  }
+
+  form.classList.remove('d-none');
+  guestNote.classList.add('d-none');
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+      submitButton.disabled = true;
+      await addComment(postId, input.value);
+      input.value = '';
+      await loadAndRenderComments(postId, currentUserId);
+    } catch (error) {
+      showError(error?.message || 'Неуспешно добавяне на коментар.');
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
+
+function setupCommentActions(postId, currentUserId) {
+  const commentsList = document.getElementById('comments-list');
+
+  if (!commentsList || !currentUserId) {
+    return;
+  }
+
+  commentsList.addEventListener('click', async (event) => {
+    const target = event.target;
+    const editButton = target.closest('[data-edit-comment-id]');
+    const deleteButton = target.closest('[data-delete-comment-id]');
+
+    if (editButton) {
+      const commentId = editButton.getAttribute('data-edit-comment-id');
+      const contentElement = document.querySelector(`[data-comment-content="${commentId}"]`);
+      const currentContent = contentElement?.textContent ?? '';
+      const updatedContent = window.prompt('Редактирайте коментара:', currentContent);
+
+      if (updatedContent === null) {
+        return;
+      }
+
+      try {
+        await updateComment(commentId, updatedContent);
+        await loadAndRenderComments(postId, currentUserId);
+      } catch (error) {
+        showError(error?.message || 'Неуспешна редакция на коментар.');
+      }
+
+      return;
+    }
+
+    if (deleteButton) {
+      const commentId = deleteButton.getAttribute('data-delete-comment-id');
+      const confirmed = window.confirm('Сигурни ли сте?');
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        deleteButton.disabled = true;
+        await deleteComment(commentId);
+        await loadAndRenderComments(postId, currentUserId);
+      } catch (error) {
+        showError(error?.message || 'Неуспешно изтриване на коментар.');
+        deleteButton.disabled = false;
+      }
+    }
+  });
 }
 
 function renderPostDetails(post, isOwner) {
@@ -107,6 +260,13 @@ export async function initPostDetailsPage() {
     if (!isOwner) {
       deleteButton?.remove();
       editButton?.remove();
+    }
+
+    setupCommentForm(postId, userContext.userId);
+    setupCommentActions(postId, userContext.userId);
+    await loadAndRenderComments(postId, userContext.userId);
+
+    if (!isOwner) {
       return;
     }
 
