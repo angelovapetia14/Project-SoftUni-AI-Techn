@@ -4,17 +4,80 @@
     <a href="/" data-link class="btn btn-outline-secondary">Back to Home</a>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light">
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Destination</th>
-          <th scope="col">Created At</th>
-          <th scope="col" class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="admin-posts-table-body"></tbody>
-    </table>
+  <ul class="nav nav-tabs mb-3" id="admin-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="admin-posts-tab" data-bs-toggle="tab" data-bs-target="#admin-posts-pane" type="button" role="tab" aria-controls="admin-posts-pane" aria-selected="true">Posts</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="admin-comments-tab" data-bs-toggle="tab" data-bs-target="#admin-comments-pane" type="button" role="tab" aria-controls="admin-comments-pane" aria-selected="false">Comments</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="admin-users-tab" data-bs-toggle="tab" data-bs-target="#admin-users-pane" type="button" role="tab" aria-controls="admin-users-pane" aria-selected="false">Users</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="admin-tab-content">
+    <div class="tab-pane fade show active" id="admin-posts-pane" role="tabpanel" aria-labelledby="admin-posts-tab" tabindex="0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Destination</th>
+              <th scope="col">Author</th>
+              <th scope="col">Created At</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-posts-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="admin-comments-pane" role="tabpanel" aria-labelledby="admin-comments-tab" tabindex="0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Content</th>
+              <th scope="col">Author</th>
+              <th scope="col">Post</th>
+              <th scope="col">Created At</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-comments-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="admin-users-pane" role="tabpanel" aria-labelledby="admin-users-tab" tabindex="0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Email</th>
+              <th scope="col">Username</th>
+              <th scope="col">Role</th>
+              <th scope="col">Created At</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="admin-view-modal" tabindex="-1" aria-labelledby="admin-view-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="admin-view-modal-title">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="admin-view-modal-body"></div>
+      </div>
+    </div>
   </div>
 </section>

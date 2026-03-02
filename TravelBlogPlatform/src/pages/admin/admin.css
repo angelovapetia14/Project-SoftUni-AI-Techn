@@ -5,3 +5,15 @@
 .admin-dashboard .btn-sm {
   min-width: 88px;
 }
+
+.admin-dashboard .tab-pane {
+  padding-top: 0.25rem;
+}
+
+.admin-dashboard .table td {
+  vertical-align: middle;
+}
+
+.admin-dashboard .form-select-sm {
+  min-width: 120px;
+}
