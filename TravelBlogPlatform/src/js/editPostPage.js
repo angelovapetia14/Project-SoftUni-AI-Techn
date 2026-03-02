@@ -26,7 +26,7 @@ function renderImagePreview(url) {
   }
 
   if (!url) {
-    previewElement.innerHTML = '<p class="text-muted mb-0 px-3 text-center">Няма качена снимка</p>';
+    previewElement.innerHTML = '<p class="text-muted mb-0 px-3 text-center">No uploaded image</p>';
     return;
   }
 
@@ -50,7 +50,7 @@ export async function initEditPostPage() {
   const postId = params.get('id');
 
   if (!postId) {
-    showError('Липсва ID на публикация');
+    showError('Missing post ID');
     window.location.href = '/index.html';
     return;
   }
@@ -61,6 +61,7 @@ export async function initEditPostPage() {
   const destinationInput = document.getElementById('edit-destination');
   const descriptionInput = document.getElementById('edit-description');
   const travelDateInput = document.getElementById('edit-travel-date');
+  const cancelButton = document.getElementById('edit-cancel-btn');
 
   if (!form) {
     return;
@@ -82,17 +83,17 @@ export async function initEditPostPage() {
     } = await supabase.auth.getUser();
 
     if (authError) {
-      throw new Error(authError.message || 'Трябва да сте логнати');
+      throw new Error(authError.message || 'You must be logged in');
     }
 
     if (!user) {
-      throw new Error('Трябва да сте логнати');
+      throw new Error('You must be logged in');
     }
 
     const post = await getPostById(postId);
 
     if (post.user_id !== user.id) {
-      throw new Error('Нямате право да редактирате този пост');
+      throw new Error('You are not allowed to edit this post');
     }
 
     if (titleInput) {
@@ -111,10 +112,12 @@ export async function initEditPostPage() {
       travelDateInput.value = post.travel_date ?? '';
     }
 
+    cancelButton?.setAttribute('href', `/post-details.html?id=${post.id}`);
+
     renderImagePreview(post.image_url ?? null);
   } catch (error) {
     if (!error?.toastShown) {
-      showError(error?.message || 'Неуспешно зареждане на публикацията.');
+      showError(error?.message || 'Failed to load post.');
     }
     window.location.href = '/index.html';
     return;
@@ -131,7 +134,7 @@ export async function initEditPostPage() {
     const requiredFields = [titleInput, destinationInput, descriptionInput];
 
     if (!validateRequiredFields(requiredFields)) {
-      showError('Попълнете всички задължителни полета.');
+      showError('Please fill in all required fields.');
       return;
     }
 
@@ -145,7 +148,7 @@ export async function initEditPostPage() {
       await updatePost(postId, title, destination, description, imageFile, travelDate);
     } catch (error) {
       if (!error?.toastShown) {
-        showError(error?.message || 'Неуспешно обновяване на публикацията.');
+        showError(error?.message || 'Failed to update post.');
       }
     }
   });

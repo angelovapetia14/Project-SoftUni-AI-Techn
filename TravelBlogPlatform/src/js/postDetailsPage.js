@@ -89,7 +89,7 @@ function renderComments(comments, currentUserId) {
   }
 
   if (!comments.length) {
-    commentsList.innerHTML = '<p class="mb-0 text-muted">Все още няма коментари.</p>';
+    commentsList.innerHTML = '<p class="mb-0 text-muted">No comments yet.</p>';
     return;
   }
 
@@ -130,7 +130,7 @@ function setupCommentForm(postId, currentUserId) {
       input.value = '';
       await loadAndRenderComments(postId, currentUserId);
     } catch (error) {
-      showError(error?.message || 'Неуспешно добавяне на коментар.');
+      showError(error?.message || 'Failed to add comment.');
     } finally {
       submitButton.disabled = false;
     }
@@ -153,7 +153,7 @@ function setupCommentActions(postId, currentUserId) {
       const commentId = editButton.getAttribute('data-edit-comment-id');
       const contentElement = document.querySelector(`[data-comment-content="${commentId}"]`);
       const currentContent = contentElement?.textContent ?? '';
-      const updatedContent = window.prompt('Редактирайте коментара:', currentContent);
+      const updatedContent = window.prompt('Edit comment:', currentContent);
 
       if (updatedContent === null) {
         return;
@@ -163,7 +163,7 @@ function setupCommentActions(postId, currentUserId) {
         await updateComment(commentId, updatedContent);
         await loadAndRenderComments(postId, currentUserId);
       } catch (error) {
-        showError(error?.message || 'Неуспешна редакция на коментар.');
+        showError(error?.message || 'Failed to edit comment.');
       }
 
       return;
@@ -171,7 +171,7 @@ function setupCommentActions(postId, currentUserId) {
 
     if (deleteButton) {
       const commentId = deleteButton.getAttribute('data-delete-comment-id');
-      const confirmed = window.confirm('Сигурни ли сте?');
+      const confirmed = window.confirm('Are you sure?');
 
       if (!confirmed) {
         return;
@@ -182,7 +182,7 @@ function setupCommentActions(postId, currentUserId) {
         await deleteComment(commentId);
         await loadAndRenderComments(postId, currentUserId);
       } catch (error) {
-        showError(error?.message || 'Неуспешно изтриване на коментар.');
+        showError(error?.message || 'Failed to delete comment.');
         deleteButton.disabled = false;
       }
     }
@@ -231,7 +231,7 @@ export async function initPostDetailsPage() {
   const postId = searchParams.get('id');
 
   if (!postId) {
-    showError('Липсва ID на публикация');
+    showError('Missing post ID');
     window.location.href = '/index.html';
     return;
   }
@@ -253,7 +253,7 @@ export async function initPostDetailsPage() {
     }
 
     deleteButton?.addEventListener('click', async () => {
-      const confirmed = window.confirm('Сигурни ли сте?');
+      const confirmed = window.confirm('Are you sure?');
 
       if (!confirmed) {
         return;
@@ -263,13 +263,13 @@ export async function initPostDetailsPage() {
         setDeleteButtonLoadingState(deleteButton, true);
         await deletePost(postId);
       } catch (error) {
-        showError(error?.message || 'Неуспешно изтриване на публикацията.');
+        showError(error?.message || 'Failed to delete post.');
         setDeleteButtonLoadingState(deleteButton, false);
       }
     });
   } catch (error) {
     if (!error?.toastShown) {
-      showError(error?.message || 'Неуспешно зареждане на публикацията.');
+      showError(error?.message || 'Failed to load post.');
     }
     window.location.href = '/index.html';
   }

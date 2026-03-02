@@ -1,6 +1,6 @@
 <section class="p-4 p-md-5 bg-white rounded-3 shadow-sm">
   <h1 class="h2 mb-4">Edit Post</h1>
-  <p class="text-muted small mb-3">Полетата с <span class="text-danger">*</span> са задължителни.</p>
+  <p class="text-muted small mb-3">Fields marked with <span class="text-danger">*</span> are required.</p>
 
   <form id="edit-post-form" class="d-grid gap-3" novalidate>
     <div>
@@ -43,10 +43,13 @@
     <div>
       <p class="form-label mb-2">Current Image</p>
       <div class="image-preview border rounded-3 d-flex align-items-center justify-content-center" id="edit-image-preview">
-        <p class="text-muted mb-0 px-3 text-center">Няма качена снимка</p>
+        <p class="text-muted mb-0 px-3 text-center">No uploaded image</p>
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Update Post</button>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Update Post</button>
+      <a href="/index.html" data-link class="btn btn-outline-secondary" id="edit-cancel-btn">Cancel</a>
+    </div>
   </form>
 </section>

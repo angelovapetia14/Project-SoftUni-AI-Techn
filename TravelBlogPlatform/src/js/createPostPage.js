@@ -41,7 +41,7 @@ export function initCreatePostPage() {
     const requiredFields = [titleInput, destinationInput, descriptionInput];
 
     if (!validateRequiredFields(requiredFields)) {
-      showError('Попълнете всички задължителни полета.');
+      showError('Please fill in all required fields.');
       return;
     }
 
@@ -55,7 +55,7 @@ export function initCreatePostPage() {
       await createPost(title, destination, description, imageFile, travelDate);
     } catch (error) {
       if (!error?.toastShown) {
-        showError(error?.message || 'Неуспешно създаване на публикацията.');
+        showError(error?.message || 'Failed to create post.');
       }
     }
   });

@@ -8,11 +8,11 @@ async function requireCurrentUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
-    throw new Error(error.message || 'Трябва да сте логнати');
+    throw new Error(error.message || 'You must be logged in');
   }
 
   if (!user) {
-    throw new Error('Трябва да сте логнати');
+    throw new Error('You must be logged in');
   }
 
   return user;
@@ -20,7 +20,7 @@ async function requireCurrentUser() {
 
 export async function getCommentsByPostId(postId) {
   if (!postId) {
-    throw new Error('Липсва ID на публикация');
+    throw new Error('Missing post ID');
   }
 
   const supabase = assertSupabaseClient();
@@ -32,7 +32,7 @@ export async function getCommentsByPostId(postId) {
     .order('created_at', { ascending: true });
 
   if (error) {
-    throw new Error(error.message || 'Неуспешно зареждане на коментарите.');
+    throw new Error(error.message || 'Failed to load comments.');
   }
 
   return data ?? [];
@@ -40,11 +40,11 @@ export async function getCommentsByPostId(postId) {
 
 export async function addComment(postId, content) {
   if (!postId) {
-    throw new Error('Липсва ID на публикация');
+    throw new Error('Missing post ID');
   }
 
   if (!content?.trim()) {
-    throw new Error('Коментарът не може да е празен');
+    throw new Error('Comment cannot be empty');
   }
 
   const supabase = assertSupabaseClient();
@@ -61,7 +61,7 @@ export async function addComment(postId, content) {
     .single();
 
   if (error) {
-    throw new Error(error.message || 'Неуспешно добавяне на коментар.');
+    throw new Error(error.message || 'Failed to add comment.');
   }
 
   return data;
@@ -69,11 +69,11 @@ export async function addComment(postId, content) {
 
 export async function updateComment(commentId, content) {
   if (!commentId) {
-    throw new Error('Липсва ID на коментар');
+    throw new Error('Missing comment ID');
   }
 
   if (!content?.trim()) {
-    throw new Error('Коментарът не може да е празен');
+    throw new Error('Comment cannot be empty');
   }
 
   const supabase = assertSupabaseClient();
@@ -86,15 +86,15 @@ export async function updateComment(commentId, content) {
     .maybeSingle();
 
   if (fetchError) {
-    throw new Error(fetchError.message || 'Неуспешно зареждане на коментара.');
+    throw new Error(fetchError.message || 'Failed to load comment.');
   }
 
   if (!existingComment) {
-    throw new Error('Коментарът не е намерен');
+    throw new Error('Comment not found');
   }
 
   if (existingComment.user_id !== user.id) {
-    throw new Error('Нямате право да редактирате този коментар');
+    throw new Error('You are not allowed to edit this comment');
   }
 
   const { data, error: updateError } = await supabase
@@ -105,7 +105,7 @@ export async function updateComment(commentId, content) {
     .single();
 
   if (updateError) {
-    throw new Error(updateError.message || 'Неуспешно обновяване на коментара.');
+    throw new Error(updateError.message || 'Failed to update comment.');
   }
 
   return data;
@@ -113,7 +113,7 @@ export async function updateComment(commentId, content) {
 
 export async function deleteComment(commentId) {
   if (!commentId) {
-    throw new Error('Липсва ID на коментар');
+    throw new Error('Missing comment ID');
   }
 
   const supabase = assertSupabaseClient();
@@ -126,21 +126,21 @@ export async function deleteComment(commentId) {
     .maybeSingle();
 
   if (fetchError) {
-    throw new Error(fetchError.message || 'Неуспешно зареждане на коментара.');
+    throw new Error(fetchError.message || 'Failed to load comment.');
   }
 
   if (!existingComment) {
-    throw new Error('Коментарът не е намерен');
+    throw new Error('Comment not found');
   }
 
   if (existingComment.user_id !== user.id) {
-    throw new Error('Нямате право да изтриете този коментар');
+    throw new Error('You are not allowed to delete this comment');
   }
 
   const { error: deleteError } = await supabase.from('comments').delete().eq('id', commentId);
 
   if (deleteError) {
-    throw new Error(deleteError.message || 'Неуспешно изтриване на коментара.');
+    throw new Error(deleteError.message || 'Failed to delete comment.');
   }
 
   return true;

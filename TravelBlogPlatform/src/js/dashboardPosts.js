@@ -62,7 +62,7 @@ function getPostCard(post, currentUserId) {
 function renderEmpty(container) {
   container.innerHTML = `
     <div class="col-12">
-      <p class="mb-0">Няма публикации.</p>
+      <p class="mb-0">No posts yet.</p>
     </div>
   `;
 }
@@ -83,7 +83,7 @@ function bindDeleteEvents(container) {
     }
 
     const postId = deleteButton.getAttribute('data-delete-post-id');
-    const confirmed = window.confirm('Сигурни ли сте?');
+    const confirmed = window.confirm('Are you sure?');
 
     if (!confirmed) {
       return;
@@ -95,7 +95,7 @@ function bindDeleteEvents(container) {
       deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Deleting...';
       await deletePost(postId);
     } catch (error) {
-      showError(error?.message || 'Неуспешно изтриване на публикацията.');
+      showError(error?.message || 'Failed to delete post.');
       deleteButton.disabled = false;
       deleteButton.innerHTML = deleteButton.dataset.originalHtml || 'Delete';
     }
@@ -122,7 +122,7 @@ export async function initDashboardPosts() {
     container.innerHTML = posts.map((post) => getPostCard(post, currentUserId)).join('');
   } catch (error) {
     if (!error?.toastShown) {
-      showError(error?.message || 'Неуспешно зареждане на публикациите.');
+      showError(error?.message || 'Failed to load posts.');
     }
 
     renderEmpty(container);

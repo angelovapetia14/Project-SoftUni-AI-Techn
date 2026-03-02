@@ -34,7 +34,7 @@ async function loadImageFromFile(file) {
 
     image.onerror = () => {
       URL.revokeObjectURL(objectUrl);
-      reject(new Error('Неуспешно зареждане на изображението.'));
+      reject(new Error('Failed to load image.'));
     };
 
     image.src = objectUrl;
@@ -76,7 +76,7 @@ async function resizeAndScaleImage(file) {
   const context = canvas.getContext('2d');
 
   if (!context) {
-    throw new Error('Неуспешно оразмеряване на изображението.');
+    throw new Error('Failed to resize image.');
   }
 
   context.drawImage(image, 0, 0, scaled.width, scaled.height);
@@ -89,7 +89,7 @@ async function resizeAndScaleImage(file) {
     canvas.toBlob(
       (value) => {
         if (!value) {
-          reject(new Error('Неуспешно генериране на изображението.'));
+          reject(new Error('Failed to generate image blob.'));
           return;
         }
 
@@ -163,7 +163,7 @@ function buildHandledError(message) {
 
 function validatePostFields(title, destination, description) {
   if (!title?.trim() || !destination?.trim() || !description?.trim()) {
-    throw new Error('Title, destination и description са задължителни.');
+    throw new Error('Title, destination and description are required.');
   }
 }
 
@@ -179,7 +179,7 @@ async function getCurrentUserId() {
   }
 
   if (!user) {
-    throw new Error('Трябва да сте логнати');
+    throw new Error('You must be logged in');
   }
 
   const username = user.email?.split('@')[0] ?? `user-${user.id.slice(0, 6)}`;
@@ -217,7 +217,7 @@ async function insertPhotoRecord(postId, imageUrl, uploadedBy) {
 
 export async function getPostById(postId) {
   if (!postId) {
-    throw new Error('Липсва ID на публикация');
+    throw new Error('Missing post ID');
   }
 
   const supabase = assertSupabaseClient();
@@ -231,7 +231,7 @@ export async function getPostById(postId) {
 
     return data;
   } catch (error) {
-    const message = normalizeMessage(error, 'Неуспешно зареждане на публикацията.');
+    const message = normalizeMessage(error, 'Failed to load post.');
     showError(message);
     throw buildHandledError(message);
   }
@@ -252,7 +252,7 @@ export async function getAllPosts() {
 
     return data ?? [];
   } catch (error) {
-    const message = normalizeMessage(error, 'Неуспешно зареждане на публикациите.');
+    const message = normalizeMessage(error, 'Failed to load posts.');
     showError(message);
     throw buildHandledError(message);
   }
@@ -304,10 +304,10 @@ export async function createPost(title, destination, description, imageFile, tra
       await insertPhotoRecord(insertedPostId, imageUrl, currentUserId);
     }
 
-    showSuccess('Публикацията е създадена');
+    showSuccess('Post created successfully');
     window.location.href = '/index.html';
   } catch (error) {
-    const message = normalizeMessage(error, 'Неуспешно създаване на публикацията.');
+    const message = normalizeMessage(error, 'Failed to create post.');
     showError(message);
     throw buildHandledError(message);
   }
@@ -316,7 +316,7 @@ export async function createPost(title, destination, description, imageFile, tra
 export async function updatePost(postId, title, destination, description, imageFile, travelDate) {
   try {
     if (!postId) {
-      throw new Error('Липсва ID на публикация');
+      throw new Error('Missing post ID');
     }
 
     validatePostFields(title, destination, description);
@@ -326,7 +326,7 @@ export async function updatePost(postId, title, destination, description, imageF
     const existingPost = await getPostById(postId);
 
     if (existingPost.user_id !== currentUserId) {
-      throw new Error('Нямате право да редактирате този пост');
+      throw new Error('You are not allowed to edit this post');
     }
 
     let imageUrl = existingPost.image_url ?? null;
@@ -366,10 +366,10 @@ export async function updatePost(postId, title, destination, description, imageF
       await insertPhotoRecord(postId, imageUrl, currentUserId);
     }
 
-    showSuccess('Публикацията е обновена');
+    showSuccess('Post updated successfully');
     window.location.href = `/post-details.html?id=${postId}`;
   } catch (error) {
-    const message = normalizeMessage(error, 'Неуспешно обновяване на публикацията.');
+    const message = normalizeMessage(error, 'Failed to update post.');
     if (!error?.toastShown) {
       showError(message);
     }
@@ -379,7 +379,7 @@ export async function updatePost(postId, title, destination, description, imageF
 
 export async function deletePost(postId) {
   if (!postId) {
-    throw new Error('Липсва ID на публикация');
+    throw new Error('Missing post ID');
   }
 
   const supabase = assertSupabaseClient();
@@ -390,11 +390,11 @@ export async function deletePost(postId) {
   } = await supabase.auth.getUser();
 
   if (authError) {
-    throw new Error(authError.message || 'Трябва да сте логнати');
+    throw new Error(authError.message || 'You must be logged in');
   }
 
   if (!user) {
-    throw new Error('Трябва да сте логнати');
+    throw new Error('You must be logged in');
   }
 
   const { data: post, error: postError } = await supabase
@@ -404,23 +404,23 @@ export async function deletePost(postId) {
     .maybeSingle();
 
   if (postError) {
-    throw new Error(postError.message || 'Неуспешно зареждане на публикацията.');
+    throw new Error(postError.message || 'Failed to load post.');
   }
 
   if (!post) {
-    throw new Error('Публикацията не е намерена');
+    throw new Error('Post not found');
   }
 
   if (post.user_id !== user.id) {
-    throw new Error('Нямате право да изтриете този пост');
+    throw new Error('You are not allowed to delete this post');
   }
 
   const { error: deleteError } = await supabase.from('posts').delete().eq('id', postId);
 
   if (deleteError) {
-    throw new Error(deleteError.message || 'Неуспешно изтриване на публикацията.');
+    throw new Error(deleteError.message || 'Failed to delete post.');
   }
 
-  showInfo('Публикацията е изтрита');
+  showInfo('Post deleted successfully');
   window.location.href = '/index.html';
 }

@@ -33,7 +33,7 @@ function getPostCard(post) {
   `;
 }
 
-function renderEmpty(container, message = 'Няма публикации.') {
+function renderEmpty(container, message = 'No posts yet.') {
   container.innerHTML = `
     <div class="col-12">
       <p class="mb-0">${message}</p>
@@ -82,7 +82,7 @@ export async function initHomePage() {
       });
 
       if (!filteredPosts.length) {
-        renderEmpty(container, 'Няма публикации.');
+        renderEmpty(container, 'No posts found.');
         return;
       }
 
@@ -97,7 +97,7 @@ export async function initHomePage() {
     searchInput?.addEventListener('input', runFilter);
   } catch (error) {
     if (!error?.toastShown) {
-      showError(error?.message || 'Неуспешно зареждане на публикациите.');
+      showError(error?.message || 'Failed to load posts.');
     }
 
     renderEmpty(container);
