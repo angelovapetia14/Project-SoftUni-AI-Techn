@@ -1,4 +1,5 @@
 import { getPostById, updatePost } from './posts.js';
+import { assertSupabaseClient } from './supabaseClient.js';
 import { showError } from './toast.js';
 
 function renderImagePreview(url) {
@@ -46,7 +47,25 @@ export async function initEditPostPage() {
   }
 
   try {
+    const supabase = assertSupabaseClient();
+    const {
+      data: { user },
+      error: authError
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      throw new Error(authError.message || 'Трябва да сте логнати');
+    }
+
+    if (!user) {
+      throw new Error('Трябва да сте логнати');
+    }
+
     const post = await getPostById(postId);
+
+    if (post.user_id !== user.id) {
+      throw new Error('Нямате право да редактирате този пост');
+    }
 
     const titleInput = document.getElementById('edit-title');
     const destinationInput = document.getElementById('edit-destination');

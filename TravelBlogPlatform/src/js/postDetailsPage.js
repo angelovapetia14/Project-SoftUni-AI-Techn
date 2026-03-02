@@ -1,6 +1,5 @@
 import { assertSupabaseClient } from './supabaseClient.js';
 import { deletePost, getPostById } from './posts.js';
-import { getProfileRole } from './auth.js';
 import { addComment, deleteComment, getCommentsByPostId, updateComment } from './comments.js';
 import { showError } from './toast.js';
 
@@ -14,19 +13,11 @@ async function getCurrentUserContext() {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    return { userId: null, role: 'guest' };
-  }
-
-  let role = 'user';
-
-  try {
-    role = await getProfileRole(user.id);
-  } catch {
+    return { userId: null };
   }
 
   return {
-    userId: user.id,
-    role
+    userId: user.id
   };
 }
 
@@ -223,11 +214,16 @@ function renderPostDetails(post, isOwner) {
   titleElement.textContent = post.title ?? '';
   destinationElement.textContent = `Destination: ${post.destination ?? 'Unknown destination'}`;
   descriptionElement.textContent = post.description ?? '';
-  editButton.setAttribute('href', `/edit-post.html?id=${post.id}`);
 
-  if (!isOwner) {
-    deleteButton.style.display = 'none';
+  if (isOwner) {
+    editButton.setAttribute('href', `/edit-post.html?id=${post.id}`);
+    editButton.classList.remove('d-none');
+    deleteButton.classList.remove('d-none');
+    return;
   }
+
+  editButton.classList.add('d-none');
+  deleteButton.classList.add('d-none');
 }
 
 export async function initPostDetailsPage() {
@@ -242,25 +238,11 @@ export async function initPostDetailsPage() {
 
   try {
     const [post, userContext] = await Promise.all([getPostById(postId), getCurrentUserContext()]);
-    const isGuest = !userContext.userId;
-    const isAdmin = userContext.role === 'admin';
-    const isOwner = userContext.userId === post.user_id;
+    const isOwner = Boolean(userContext.userId && userContext.userId === post.user_id);
 
     renderPostDetails(post, isOwner);
 
     const deleteButton = document.getElementById('delete-btn');
-    const editButton = document.getElementById('edit-btn');
-
-    if (isGuest || isAdmin) {
-      deleteButton?.remove();
-      editButton?.remove();
-      return;
-    }
-
-    if (!isOwner) {
-      deleteButton?.remove();
-      editButton?.remove();
-    }
 
     setupCommentForm(postId, userContext.userId);
     setupCommentActions(postId, userContext.userId);
