@@ -1,21 +1,48 @@
 import { assertSupabaseClient } from './supabaseClient.js';
 import { deletePost, getPostById } from './posts.js';
+import { getProfileRole } from './auth.js';
 import { showError } from './toast.js';
 
 const FALLBACK_IMAGE = 'https://placehold.co/1600x900?text=No+Image';
 
-async function getCurrentUserId() {
+async function getCurrentUserContext() {
   const supabase = assertSupabaseClient();
   const {
     data: { user },
     error
   } = await supabase.auth.getUser();
 
-  if (error) {
-    throw error;
+  if (error || !user) {
+    return { userId: null, role: 'guest' };
   }
 
-  return user?.id ?? null;
+  let role = 'user';
+
+  try {
+    role = await getProfileRole(user.id);
+  } catch {
+  }
+
+  return {
+    userId: user.id,
+    role
+  };
+}
+
+function setDeleteButtonLoadingState(button, isLoading) {
+  if (!button) {
+    return;
+  }
+
+  if (isLoading) {
+    button.dataset.originalHtml = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Deleting...';
+    return;
+  }
+
+  button.disabled = false;
+  button.innerHTML = button.dataset.originalHtml || 'Delete';
 }
 
 function renderPostDetails(post, isOwner) {
@@ -61,19 +88,25 @@ export async function initPostDetailsPage() {
   }
 
   try {
-    const [post, currentUserId] = await Promise.all([getPostById(postId), getCurrentUserId()]);
-    const isOwner = currentUserId === post.user_id;
+    const [post, userContext] = await Promise.all([getPostById(postId), getCurrentUserContext()]);
+    const isGuest = !userContext.userId;
+    const isAdmin = userContext.role === 'admin';
+    const isOwner = userContext.userId === post.user_id;
 
     renderPostDetails(post, isOwner);
 
     const deleteButton = document.getElementById('delete-btn');
     const editButton = document.getElementById('edit-btn');
 
+    if (isGuest || isAdmin) {
+      deleteButton?.remove();
+      editButton?.remove();
+      return;
+    }
+
     if (!isOwner) {
       deleteButton?.remove();
-      editButton?.removeAttribute('href');
-      editButton?.classList.add('disabled');
-      editButton?.setAttribute('aria-disabled', 'true');
+      editButton?.remove();
       return;
     }
 
@@ -85,9 +118,11 @@ export async function initPostDetailsPage() {
       }
 
       try {
+        setDeleteButtonLoadingState(deleteButton, true);
         await deletePost(postId);
       } catch (error) {
         showError(error?.message || 'Неуспешно изтриване на публикацията.');
+        setDeleteButtonLoadingState(deleteButton, false);
       }
     });
   } catch (error) {

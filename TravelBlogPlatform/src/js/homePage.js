@@ -33,16 +33,31 @@ function getPostCard(post) {
   `;
 }
 
-function renderEmpty(container) {
+function renderEmpty(container, message = 'Няма публикации.') {
   container.innerHTML = `
     <div class="col-12">
-      <p class="mb-0">Няма публикации.</p>
+      <p class="mb-0">${message}</p>
     </div>
   `;
 }
 
+function renderPosts(container, posts) {
+  if (!posts.length) {
+    renderEmpty(container);
+    return;
+  }
+
+  container.innerHTML = posts.map(getPostCard).join('');
+}
+
+function normalizeText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 export async function initHomePage() {
   const container = document.getElementById('posts-container');
+  const form = document.getElementById('home-search-form');
+  const searchInput = document.getElementById('home-search-input');
 
   if (!container) {
     return;
@@ -50,13 +65,30 @@ export async function initHomePage() {
 
   try {
     const posts = await getAllPosts();
+    renderPosts(container, posts);
 
-    if (!posts.length) {
-      renderEmpty(container);
-      return;
-    }
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const query = normalizeText(searchInput?.value);
 
-    container.innerHTML = posts.map(getPostCard).join('');
+      if (!query) {
+        renderPosts(container, posts);
+        return;
+      }
+
+      const filteredPosts = posts.filter((post) => {
+        const title = normalizeText(post.title);
+        const destination = normalizeText(post.destination);
+        return title.includes(query) || destination.includes(query);
+      });
+
+      if (!filteredPosts.length) {
+        renderEmpty(container, 'Няма публикации.');
+        return;
+      }
+
+      renderPosts(container, filteredPosts);
+    });
   } catch (error) {
     if (!error?.toastShown) {
       showError(error?.message || 'Неуспешно зареждане на публикациите.');

@@ -90,9 +90,14 @@ function bindDeleteEvents(container) {
     }
 
     try {
+      deleteButton.dataset.originalHtml = deleteButton.innerHTML;
+      deleteButton.disabled = true;
+      deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Deleting...';
       await deletePost(postId);
     } catch (error) {
       showError(error?.message || 'Неуспешно изтриване на публикацията.');
+      deleteButton.disabled = false;
+      deleteButton.innerHTML = deleteButton.dataset.originalHtml || 'Delete';
     }
   });
 }
